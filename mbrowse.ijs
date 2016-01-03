@@ -8,10 +8,9 @@ NB. -----------------------------------------------
 NB. Copyright © 2016 Michal J Wallace
 NB. Available for public use under the MIT license.
 NB. -----------------------------------------------
-
+coclass 'mbrowse'
 
 NB. == dependencies ===============================
-coclass 'mbrowse'
 coinsert'jviewmat' [ load 'viewmat'
 
 NB. !! this is a workaround for a j8 bug (as of 01/02/2016)
@@ -80,9 +79,13 @@ repaint =: 3 : 0
 )
 
 update_status =: 3 : 0
-  mp =. ' pos: ', ": 8j5 ": +. mw''
+  NB. the '+' in '+. +' negates the imaginary part, to flip
+  NB. the y coordinate. (the image is actually upside down,
+  NB. but it doesn't matter since the mandelbrot set is
+  NB. symmetric across the x axis.)
+  mp =. ' pos: ', ": 8j5 ": +. + mw''
   sc =. ' scale: ', ": SCALE
-  cn =. ' center: ', ": +. CENTER
+  cn =. ' center: ', ": +. + CENTER
   hl =. ' [', ' res] ',~ > HIRES { 'lo';'hi'
   it =. ' iterations: ', ": ITERS
   wd 'set sb setlabel text "', hl, it, sc, cn, mp, '";'
