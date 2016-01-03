@@ -41,11 +41,11 @@ NB. == mandelbrot verbs ===========================
 
 NB. mbrot y  → 0 if bounded
 NB. else number of iterations where value was > 2
-iters =: 1 : 0
-  NB. calling 'm iters' rebuilds the 'mbrot' verb.
-  NB. (you can't define verbs inside a verb so it has to be an adverb)
-  ITERS =: m
+iters =: 3 : 0
+  NB. calling 'iters y' resets ITERS and rebuilds the 'mbrot' verb.
+  ITERS =: y
   mbrot =: [: +/ 2 <&| ((+ *:) :: _:)"0^:(<ITERS) & 0
+  EMPTY NB. b/c a verb can't be the return value, or you get a syntax error.
 )
 
 c2w =: 3 : 0 NB. camera [0j0 in upper left] to world (centered,zoomed)
@@ -114,8 +114,8 @@ w_g_char =: 3 : 0 NB. keypress handler
     else.  SCALE =: +: SCALE [ GRAIN =: +: GRAIN [ SHAPE =: -: SHAPE end.
 
   NB. +/- key change number of iterations, to change level of detail
-  case. '+' do. (ITERS + 8) iters
-  case. '-' do. (1 >. ITERS - 8) iters
+  case. '+' do. iters ITERS + 8
+  case. '-' do. iters 1 >. ITERS - 8
   end.
 
   repaint [ render''
@@ -125,7 +125,7 @@ NB. == launch window and draw =====================
 
 create =: (3 : 0)
   reset''
-  ITERS iters
+  iters ITERS
   wd 'pc w closeok; minwh ', (": SHAPE * GRAIN), ';'
   wd 'pn mandelbrowse;'
   wd 'cc g isidraw;'
