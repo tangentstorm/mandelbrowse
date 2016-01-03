@@ -1,0 +1,460 @@
+#+title: building a gui in j
+
+* demo the app
+This video is a brief introduction to GUI programming in J.
+
+We're going to look at an example program I made
+that lets you browse the mandelbrot set.
+
+If you want to follow along yourself, 
+you can grab it from my github page:
+
+  https://github.com/tangentstorm/mandelbrowse/
+
+I'm jqt right now. I'm going to load the code:
+
+: load 'c:/ver/mandelbrowse/mbrowse.ijs'
+
+And run it:
+
+: m =: mbrowse''
+
+So, here's the mandelbrot set.
+
+You can click anywhere on the image to zoom in on that point
+  [ zoom in around (-0.5, 0.5) ]
+
+or right click to zoom out.
+
+To keep this interaction fast
+it starts out in a low resolution mode, 
+and the detail is turned down pretty low.
+
+You can press the plus sign to increase the
+amount of detail after you zoom in.
+
+And then when you find an image you like, 
+you can press space to switch to higher resolution.
+
+As you can see, it takes a while to redraw.
+
+You can also press 'r' to reset everything 
+back to the initial values.
+
+That's pretty much all this application does.
+
+Let's take a look at the code and see how it works.
+
+* the mandelbrot set itself
+
+The most import line 
+as far as the mandelbrot set goes
+is line 46 here.
+
+When you look at these images, the
+Mandelbrot set is the black part in 
+the middle.
+
+It's a set of numbers on the
+of the complex plane
+from about negative two on the left
+to about 0.5 on the right
+and about 1.2 to -1.2 
+on the imaginary axis.
+
+What you do is you take a number,
+let's call it n
+and then starting from zero,
+you repeatedly square the value
+and then add n.
+
+So for example, is n = 2
+then 0 squared + 2 is 2
+then 2 squared + 2 is 6
+and 6 squared + 2 is 38
+and it very quickly goes off to infinity.
+
+So we say it "diverges".
+
+But if you start with n = -1,
+then 0 squared + -1 is -1
+and -1 squared + -1 is 0
+and it just repeats in a cycle forever.
+
+The ones that go in a cycle 
+are part of the mandelbrot set,
+and the ones that go off to infinity
+are outside the set.
+
+The trick is that for numbers
+close to the edge of the set, 
+it can take quite a few steps 
+before you know for sure
+whether or not it diverges.
+
+So what we do here is 
+use the power conjunction
+to perform a certain number of iterations
+and we just test whether or not the
+magnitude is less than two.
+
+As soon as you you more than 
+two units away from the origin,
+it always diverges.
+
+Then, since we're doing this comparison 
+multiple times, we end up with a
+a whole series for bits for each point.
+What it's doing is summing up the number
+of times it was true.
+
+The smaller that number, the longer it 
+took before we could tell it diverged.
+
+That doesn't actually make any difference
+to wether or not it's in the set,
+but what it does do is let us 
+pick different colors 
+and make these cool looking images.
+
+Anyway, this mbrot verb figures out the color
+for each individual point.
+
+Up here in the `reset` verb, 
+we have a bunch of configuration settings.
+
+Then `c2w` uses those settings 
+to move the camera around
+and zoom in and out.
+
+So then this 'plane' verb 
+generates a 2d array of complex numbers
+for the area we're looking at.
+
+Then `render` applies the mbrot verb.
+
+And then `repaint` just passes it to viewmat
+along with our custom color palette.
+
+It's actually `viewmatcc`, which is just the
+normal viewmat function, except it draws to 
+a specific control in our window 
+rather than making a window of its own.
+
+So that's a quick overview 
+of how the actual 
+mandelbrot stuff works.
+
+I really want to focus on
+the actual gui stuff, 
+so I'm not going to explain that 
+in any more detail.
+
+If you have questions, feel free to ask
+in the comments or post to the mailing
+list or the IRC channel.
+
+Or just go get the code and experiment.
+
+* the gui stuff
+
+Right. So now onto the GUI stuff.
+
+I'm going to skip over all this event handler stuff for a minute,
+and come down to this `create` verb.
+
+Other than calling `reset` and `repaint` 
+which we already looked at
+you can see it's just a bunch of calls
+to this 'wd' verb.
+
+So, 'wd' is short for 'window driver', and
+it's basically a little domain specific language 
+for creating GUIs.
+
+This first line says 
+create a parent control ('pc')
+named 'w' (for window)
+you should be able to close it.
+and the minimum shape comes in from the configuration.
+
+The parent name is mandelbrowse
+that's going to show up in the title bar.
+
+It has a child control
+named 'g' for graphics
+and it's an isidraw control.
+isi is iverson software inc.
+Which was the old company name for jsoftware.
+
+So basically that's where viewmatcc is going to draw.
+And what the cc stands for - child control.
+
+There's another child control called sb
+and it's a status bar. And in QT you can
+have multiple sections in a status bar.
+So in our case, we're adding a label called text.
+
+And then we're going to center the window and show it.
+
+And that's actually all you need 
+to create a window in J.
+
+In fact, jqt is all event driven, 
+and it's already running inside a gui mainloop, 
+so you can just run wd
+manually to create a new window.
+
+:  wd 'pc w closeok; pshow'
+
+But really 
+if you're going to be writing GUI stuff
+you're better off making a script.
+
+* objects 
+
+So the reason this is called 'create'
+is because it's a constructor.
+
+The verb we used to launch the program
+was mbrowse,
+and it's actually defined down here
+in the z locale so it's visible from
+everywhere.
+
+And this entire file is executing
+in a locale called 'mbrowse'.
+That's because the very first line...
+... is `coclass mbrowse`.
+
+So locales are just namespaces,
+except they can be chained
+so that if the word you're looking for
+isn't defined, you can acquire it from
+the next link in the chain.
+
+In fact,
+that's what the 'z' locale is all about.
+It's called 'z' because it's alwasy the
+last locale in the chain. 
+Putting something in z means you can use it from anywhere.
+As long as some other link in the chain
+didn't override it.
+
+Anyway, all 'coclass' does 
+is change the current locale.
+
+It's actually exactly the same 
+as 'cocurrent' 
+but for readability
+it indicates that you intend 
+to treat the new locale as a class.
+
+# <scroll back to the bottom down>
+So then when you call 'conew'
+and pass it the name of a locale,
+
+it'll actually create a new locale
+whose name is actually a number
+
+it's going to insert the given locale
+into the chain
+by calling coinsert
+and then if you pass it a left argument
+it's going to look for a verb called 'create'
+and call that as the constructor.
+
+My personal preference coming from python
+is to hide the call to conew 
+and just create one of these global verbs
+corresponding to the class name.
+
+So that's why we launch this thing with
+mbrowse'' and we capture the result in
+a variable.
+
+You actually don't need conew at all 
+to make a GUI, 
+but if you don't use it
+then if you open two windows at once,
+they wind up sharing the same variables
+and they interfere with each other.
+So adding those couple lines gives you
+a fresh copy of all your data.
+
+# <demo>
+So now if you want to inspect that data
+interactively you can say
+
+: cocurrent m
+
+and then when you type
+
+: names''
+
+you'll see all your object's private variables
+as well as these variables that wd sets up.
+
+* events
+
+Okay now that we've got our window
+and our class set up, 
+the next step is to tell it how to behave.
+
+That's what these event handlers are all about.
+
+The way this works is a naming convention.
+When we set up this window, we called it 'w'
+and we called the graphics control 'g'.
+
+So when you call 'wd' 
+and create a named control like that
+it's going to look in the current locale
+for verbs that use those names as a prefix
+and also correspond to the events
+associated with that kind of control.
+
+So for example, that 'isidraw' control
+has some events for mouse and keyboard interaction.
+Of it's j, so the names are abbreviated,
+but here's mouse button left up
+and mouse button right up
+mouse move
+and char 
+which tells you when a keyboard character got pressed.
+
+When these events come in,
+the data doesn't come in as an argument
+instead, the information gets stored 
+in those variables that wd creates in your locale. 
+So for the isidraw control,
+when an event is running,
+all information about the event.
+the sysdata variable.
+
+So this mw verb grabs the 
+x and y coordinates of the mouse
+out sysdata
+and then convert to world coordinates
+based on the camera settings.
+
+This little verb here (<.@%)~ is actually
+taking the floor of a division
+and it's dividing by this GRAIN variable.
+
+That's because we actually have 
+more pixels on the screen
+than data points in our matrix.
+GRAIN says how many real pixels
+correspond to each data point.
+And this division here is making
+the mouse snap to one of the actual points.
+
+Anyway, that's used to get the new center point
+when you left click.
+It pushes the old center onto a stack
+
+and then when you right click,
+it pops the old value off the stack.
+Unless it's the only one left,
+in which case it just leaves it alone.
+
+Once the center changes, we have to repaint.
+
+In theory, you should just be able to call viewmatcc,
+and pass it the name of the isidraw control. ('g')
+
+But for some reason, in j804 that's not working quite
+right, so I had to redefine it slightly to force it to
+repaint. Or you can just manually call this 'glpaint'
+verb.
+
+Anyway, we only repaint when the image changes, 
+and when that happens, we also want 
+to update the status bar.
+
+That's really just a bunch of string formatting
+followed by a wd command to set the text.
+
+# <scroll down to w_g_mmove>
+
+And of course we also update the status bar
+every time the user moves the mouse
+just so you can kind of see where you're pointing.
+
+And then for the keyboard handler,
+we just do this char function.
+
+There's really not much to it.
+Sysdata is going to contain an array 
+Because characters literals are only byte
+but with arrows 
+and modifier keys
+you wind up needing more than one byte. 
+I'm not messing with that stuff here though
+so I just take the head
+and then it's a straight character comparison.
+
+And that's pretty much all there is 
+to this whole application.
+
+Hopefully that'll get you started 
+with making your own GUIs.
+
+If you want to learn more,
+the best docs for the window driver
+are actually on the wiki
+
+  http://code.jsoftware.com/wiki/Guides/Window_Driver
+  
+The 'Overview' page 
+covers a lot of the basics I showed here 
+but in more detail.
+
+The 'wd command reference' explains 
+the little mini language.
+
+There's also a whole set of 
+drawing commands for isidraw in 
+this gl2 locale.
+
+And then if you look under Window Controls, 
+this page is mostly about general things
+that all apply to all the controls,
+but at the very bottom here there's a link
+to Wind Driver ChildClasses
+
+  http://code.jsoftware.com/wiki/Guides/Window_Driver/ChildClasses
+
+
+And that actually has details
+on all the controls you can use
+including their properties and events.
+
+And then also if you go to..
+Help / Studio / Qt Demos
+There's all kinds of examples you can run
+and you can also view the source code.
+
+There's also some advanced demos 
+and small applications under
+Help / Studio / Showcase.
+ 
+If for some reason you don't have this,
+you can probably install it under tools/package manager.
+I usually just install everything.
+It doesn't take up much space at all.
+
+And then you have plenty of example code 
+to look at.
+
+Anyway, that's it.
+Thanks for watching.
+If you liked this please subscribe
+and check out some of my other videos.
+Whether you liked it or not
+please feel free to leave a comment
+and let me know what you think.
+
+See you next time!
+
