@@ -22,7 +22,7 @@ rgb =: (3$256) #: [: dfh;._1 ' ',]
 NB. == configuration ==============================
 
 reset =: 3 : 0
-  ITERS =: 32              NB. # of iterations of the formula.
+  ITERS =: 24              NB. # of iterations of the formula.
   CENTER =: _1j0           NB. center of the view
   SHAPE =: 320 240         NB. width, height of the data array
   GRAIN =: 2               NB. pixels per array entry
@@ -59,11 +59,9 @@ render =: 3 : 0
 
 NB. === event handlers =============================
 
-div =: <.@%
-
 mw =: 3 : 0  NB. mouse position in world cordinates
   mxy =. 2 {. _".sysdata
-  c2w j./ GRAIN div~ mxy
+  c2w j./ GRAIN (<.@%)~ mxy
 )
 
 w_cancel =: 3 : 0
