@@ -148,4 +148,4 @@ NB. Once you've closed the window, you can type `cocurrent 'base'`
 NB. (to re-enter the default locale), and then `codestroy__m''` to
 NB. destroy the object.
 NB.
-mbrowse_z_ =: conew & 'mbrowse'
+mbrowse_z_ =: conew bind 'mbrowse'
