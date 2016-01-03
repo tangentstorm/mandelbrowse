@@ -11,7 +11,7 @@ NB. -----------------------------------------------
 coclass 'mbrowse'
 
 NB. == dependencies ===============================
-coinsert'jviewmat' [ load 'viewmat'
+load 'viewmat'
 
 NB. !! this is a workaround for a j8 bug (as of 01/02/2016)
 NB. (without this fix, it won't redraw the viewmat control)
@@ -127,7 +127,7 @@ w_g_char =: 3 : 0 NB. keypress handler
 
 NB. == launch window and draw =====================
 
-create =: (3 : 0)
+create =: 3 : 0
   reset''
   wd 'pc w closeok; minwh ', (": SHAPE * GRAIN), ';'
   wd 'pn mandelbrowse;'
@@ -145,7 +145,8 @@ NB. Register a global constructor, so you can launch like this:
 NB.
 NB.     m =: mbrowse''
 NB.
-NB. You can then type `cocurrent > m` to enter the application's locale in the J terminal.
+NB. You can then type `cocurrent m` to enter the application's
+NB. locale in the J terminal.
 NB.
 NB. Once you've closed the window, you can type `cocurrent 'base'`
 NB. (to re-enter the default locale), and then `codestroy__m''` to
