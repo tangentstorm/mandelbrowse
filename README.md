@@ -18,3 +18,4 @@ Run with JQt from http://jsoftware.com/
 - Right click to zoom back out.
 - Press space to toggle high resolution mode.
 - Press `+` to increase or `-` to decrease the number of iterations of the mandelbrot formula (level of detail)
+- Press 'r' to reset everything to the default values.

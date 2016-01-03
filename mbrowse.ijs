@@ -24,7 +24,7 @@ rgb =: (3$256) #: [: dfh;._1 ' ',]
 NB. == configuration ==============================
 
 reset =: 3 : 0
-  ITERS =: 24              NB. # of iterations of the formula.
+  iters 24                 NB. # of iterations of the formula.
   CENTER =: _1j0           NB. center of the view
   SHAPE =: 160 120         NB. width, height of the data array
   GRAIN =: 4               NB. pixels per array entry
@@ -116,6 +116,7 @@ w_g_char =: 3 : 0 NB. keypress handler
   NB. +/- key change number of iterations, to change level of detail
   case. '+' do. iters ITERS + 8
   case. '-' do. iters 1 >. ITERS - 8
+  case. 'r' do. reset''
   end.
 
   repaint [ render''
@@ -125,7 +126,6 @@ NB. == launch window and draw =====================
 
 create =: (3 : 0)
   reset''
-  iters ITERS
   wd 'pc w closeok; minwh ', (": SHAPE * GRAIN), ';'
   wd 'pn mandelbrowse;'
   wd 'cc g isidraw;'
