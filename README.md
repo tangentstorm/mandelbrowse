@@ -1,7 +1,7 @@
 # mandelbrowse
 A visual Mandelbrot set explorer written in J
 
-![mandelbrowse screenshot](http://i.imgur.com/hAxhtTPl.png)
+![mandelbrowse screenshot](http://i.imgur.com/nh7bG8Q.png)
 
 ## instructions
 
