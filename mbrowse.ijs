@@ -25,14 +25,13 @@ NB. == configuration ==============================
 reset =: 3 : 0
   ITERS =: 24              NB. # of iterations of the formula.
   CENTER =: _1j0           NB. center of the view
-  SHAPE =: 320 240         NB. width, height of the data array
-  GRAIN =: 2               NB. pixels per array entry
+  SHAPE =: 160 120         NB. width, height of the data array
+  GRAIN =: 4               NB. pixels per array entry
   STEP  =: {. 4 3 % SHAPE  NB. initial step between array units
   SCALE =: 1               NB. user zoom factor
   CENTERS =: ,CENTER       NB. stack of center values
-  LOWRES =: 0              NB. toggle for low resolution
+  HIRES =: 0               NB. toggle with space key for high resolution
 )
-reset''
 
 NB. color scheme: black, white, golds and blues
 pal =: rgb '0 ffffff ffd21d b28f00 400fe8 1d2799 000055 000033'
@@ -41,7 +40,12 @@ NB. == mandelbrot verbs ===========================
 
 NB. mbrot y  → 0 if bounded
 NB. else number of iterations where value was > 2
-mbrot =: [: +/ 2 <&| ((+ *:) :: _:)"0^:(<ITERS) & 0
+iters =: 1 : 0
+  NB. calling 'm iters' rebuilds the 'mbrot' verb.
+  NB. (you can't define verbs inside a verb so it has to be an adverb)
+  ITERS =: m
+  mbrot =: [: +/ 2 <&| ((+ *:) :: _:)"0^:(<ITERS) & 0
+)
 
 c2w =: 3 : 0 NB. camera [0j0 in upper left] to world (centered,zoomed)
   CENTER + SCALE * STEP * (-: j./<:SHAPE) -~ y
@@ -77,9 +81,10 @@ repaint =: 3 : 0
 update_status =: 3 : 0
   mp =. ' pos: ', ": 8j5 ": +. mw''
   sc =. ' scale: ', ": SCALE
-  ll =. ' center: ', ": +. CENTER
-  lo =. ' [', ' res] ',~ > LOWRES { 'hi';'lo'
-  wd 'set sb setlabel text "', ll, sc, lo, mp, '";'
+  cn =. ' center: ', ": +. CENTER
+  hl =. ' [', ' res] ',~ > HIRES { 'lo';'hi'
+  it =. ' iterations: ', ": ITERS
+  wd 'set sb setlabel text "', hl, it, sc, cn, mp, '";'
 )
 
 w_g_mblup =: 3 : 0 NB. left mouse button
@@ -98,20 +103,28 @@ w_g_mmove =: 3 : 0
   update_status''
 )
 
-w_g_char =: 3 : 0 NB. keypress
-  if. ' ' = sysdata do.
-    NB. space toggles low resolution for faster drawing
-    LOWRES =: -. LOWRES
-    if. LOWRES do. SCALE =: +: SCALE [ GRAIN =: +: GRAIN [ SHAPE =: -: SHAPE
-    else. SCALE =: -: SCALE [ GRAIN =: -: GRAIN [ SHAPE =: +: SHAPE end.
-    repaint [ render''
+w_g_char =: 3 : 0 NB. keypress handler
+  select. {. sysdata NB. head so we can compare against individual characters
+
+  NB. space toggles low resolution for faster drawing
+  case. ' ' do.
+    HIRES =: -. HIRES
+    if. HIRES do. SCALE =: -: SCALE [ GRAIN =: -: GRAIN [ SHAPE =: +: SHAPE
+    else.  SCALE =: +: SCALE [ GRAIN =: +: GRAIN [ SHAPE =: -: SHAPE end.
+
+  NB. +/- key change number of iterations, to change level of detail
+  case. '+' do. (ITERS + 8) iters
+  case. '-' do. (1 >. ITERS - 8) iters
   end.
+
+  repaint [ render''
 )
 
 NB. == launch window and draw =====================
 
 create =: (3 : 0)
   reset''
+  ITERS iters
   wd 'pc w closeok; minwh ', (": SHAPE * GRAIN), ';'
   wd 'pn mandelbrowse;'
   wd 'cc g isidraw;'
