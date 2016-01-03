@@ -74,10 +74,6 @@ mw =: 3 : 0  NB. mouse position in world cordinates
   c2w j./ GRAIN (<.@%)~ mxy
 )
 
-w_cancel =: 3 : 0
-  wd 'pclose'
-)
-
 update_status =: 3 : 0
   NB. the '+' in '+. +' negates the imaginary part, to flip
   NB. the y coordinate. (the image is actually upside down,
