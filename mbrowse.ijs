@@ -62,6 +62,11 @@ render =: 3 : 0
   img =: mbrot plane''
 )
 
+repaint =: 3 : 0
+  pal viewmatcc (render'');'g'
+  update_status''
+)
+
 NB. === event handlers =============================
 
 mw =: 3 : 0  NB. mouse position in world cordinates
@@ -71,11 +76,6 @@ mw =: 3 : 0  NB. mouse position in world cordinates
 
 w_cancel =: 3 : 0
   wd 'pclose'
-)
-
-repaint =: 3 : 0
-  pal viewmatcc (render'');'g'
-  update_status''
 )
 
 update_status =: 3 : 0
