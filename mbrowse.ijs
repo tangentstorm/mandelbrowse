@@ -10,7 +10,7 @@ NB. Available for public use under the MIT license.
 NB. -----------------------------------------------
 
 NB. == dependencies ===============================
-
+coclass 'mbrowse'
 coinsert'jviewmat' [ load 'viewmat'
 
 NB. !! this is a workaround for a j8 bug (as of 01/02/2016)
@@ -110,7 +110,8 @@ w_g_char =: 3 : 0 NB. keypress
 
 NB. == launch window and draw =====================
 
-(3 : 0)''
+create =: (3 : 0)
+  reset''
   wd 'pc w closeok; minwh ', (": SHAPE * GRAIN), ';'
   wd 'pn mandelbrowse;'
   wd 'cc g isidraw;'
@@ -121,3 +122,5 @@ NB. == launch window and draw =====================
 
 NB. debug verb to see just corners of a big 2d array:
 corners =: [: ({.,:{:) ({.,{:)"1
+
+mbrowse_z_ =: conew & 'mbrowse'
