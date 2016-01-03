@@ -13,7 +13,8 @@ NB. == dependencies ===============================
 
 coinsert'jviewmat' [ load 'viewmat'
 
-NB. !! this is a workaround for a j8 bug (as of 09/12/2015)
+NB. !! this is a workaround for a j8 bug (as of 01/02/2016)
+NB. (without this fix, it won't redraw the viewmat control)
 viewmatcc =: glpaint_jgl2_@viewmatcc_jviewmat_
 
 NB. verb to convert space-separated hex strings into rgb triples:
