@@ -3,11 +3,12 @@ NB.
 NB. Mandelbrowse
 NB.
 NB. A visual Mandelbrot set explorer written in J.
-NB.
+NB. See README.md for instructions.
 NB. -----------------------------------------------
 NB. Copyright © 2016 Michal J Wallace
 NB. Available for public use under the MIT license.
 NB. -----------------------------------------------
+
 
 NB. == dependencies ===============================
 coclass 'mbrowse'
@@ -136,4 +137,15 @@ create =: (3 : 0)
 NB. debug verb to see just corners of a big 2d array:
 corners =: [: ({.,:{:) ({.,{:)"1
 
+
+NB. Register a global constructor, so you can launch like this:
+NB.
+NB.     m =: mbrowse''
+NB.
+NB. You can then type `cocurrent > m` to enter the application's locale in the J terminal.
+NB.
+NB. Once you've closed the window, you can type `cocurrent 'base'`
+NB. (to re-enter the default locale), and then `codestroy__m''` to
+NB. destroy the object.
+NB.
 mbrowse_z_ =: conew & 'mbrowse'
