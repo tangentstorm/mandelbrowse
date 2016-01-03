@@ -122,7 +122,7 @@ w_g_char =: 3 : 0 NB. keypress handler
   case. 'r' do. reset''
   end.
 
-  repaint [ render''
+  repaint''
 )
 
 NB. == launch window and draw =====================
@@ -134,7 +134,7 @@ create =: (3 : 0)
   wd 'cc g isidraw;'
   wd 'cc sb statusbar; set sb addlabel text;'
   wd 'pcenter; pshow;'
-  repaint [ render''
+  repaint''
 )
 
 NB. debug verb to see just corners of a big 2d array:
